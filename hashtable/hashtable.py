@@ -36,7 +36,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -54,11 +54,13 @@ class HashTable:
 
         Implement this, and/or DJB2.
         """
-        hashsum = 0
-        for char in key:
-            hashsum += ord(char)
-            hashsum = hashsum % self.capacity
-        return hashsum
+        hash = 14695981039346656037
+        bytes_representation = key.encode()
+
+        for byte_of_data in bytes_representation:
+            hash *= 1099511628211
+            hash = hash ^ byte_of_data
+        return hash
 
     def djb2(self, key):
         """
@@ -85,8 +87,20 @@ class HashTable:
 
         Implement this.
         """
-        h = self.fnv1(key)
-        self.arr[h] = value
+        index = self.hash_index(key)
+        
+        if self.arr[index] == None:
+            self.arr[index] = HashTableEntry(key, value)
+        else:
+            pos = self.arr[index]
+            while pos != None:
+                if pos.key == key:
+                    pos.value = value
+                    return
+                if pos.next == None:
+                    pos.next = HashTableEntry(key, value)
+                    return
+                pos = pos.next
 
 
     def delete(self, key):
@@ -97,8 +111,8 @@ class HashTable:
 
         Implement this.
         """
-        h = self.fnv1(key)
-        self.arr[h] = None
+        self.put(key, None)
+        self.size -= 1
 
 
     def get(self, key):
@@ -109,8 +123,14 @@ class HashTable:
 
         Implement this.
         """
-        h = self.fnv1(key)
-        return self.arr[h]
+        index = self.hash_index(key)
+
+        pos = self.arr[index]
+        while pos != None:
+            if pos.key == key:
+                return pos.value
+            pos = pos.next
+        return None
 
 
     def resize(self, new_capacity):
