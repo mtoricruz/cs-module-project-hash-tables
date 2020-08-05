@@ -1,8 +1,8 @@
 # Your code here
 import random
 import math
+storage = {}
 
-results = {}
 
 def slowfun_too_slow(x, y):
     v = math.pow(x, y)
@@ -13,21 +13,11 @@ def slowfun_too_slow(x, y):
     return v
 
 def slowfun(x, y):
-    """
-    Rewrite slowfun_too_slow() in here so that the program produces the same
-    output, but completes quickly instead of taking ages to run.
-    """
-    for i in results:
-        i = math.pow(x, y)
-        i = math.factorial(i)
-        i //= (x + y)
-        i %= 982451653
-        results[i] = i
-        return i
-    
+    answer = (x, y)
+    if answer not in storage:
+        storage[answer] = slowfun_too_slow(x, y)
 
-
-
+    return storage[answer]
 
 # Do not modify below this line!
 
