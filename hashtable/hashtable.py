@@ -6,6 +6,9 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+    
+    def set_next(self, new_next):
+        self.next = new_next
 
 
 # Hash table can't have fewer than this many slots
@@ -15,26 +18,58 @@ class LinkedList:
     def __init__(self, head):
         self.head = head
 
+    def add_to_head(self, value):
+        new_entry = HashTableEntry(key, value)
+
+        if self.head is None:
+            self.head = new_entry
+        else:
+            self.head.set_next(new_entry) 
+            self.head = new_entry
+
+
 
 class HashTable:
+    """
+    A hash table that with `capacity` buckets
+    that accepts string keys
+
+    Implement this.
+    """
 
     def __init__(self, capacity=MIN_CAPACITY):
         self.capacity = capacity
         self.size = 0
-        self.head = None
         # self.hash = [None] * self.capacity
-        self.hash = [LinkedList(self.head)] * self.capacity
-    #     0   1
+        self.hash = [LinkedList()] * self.capacity
+    #     1  2
     #   [[], []]
 
     def get_num_slots(self):
+        """
+        Return the length of the list you're using to hold the hash
+        table data. (Not the number of items stored in the hash table,
+        but the number of slots in the main list.)
+
+        One of the tests relies on this.
+
+        Implement this.
+        """
         return self.capacity
 
 
     def get_load_factor(self):
-        pass
+        
+        
+
+
 
     def fnv1(self, key):
+        """
+        FNV-1 Hash, 64-bit
+
+        Implement this, and/or DJB2.
+        """
         hash = 14695981039346656037
         bytes_representation = key.encode()
 
@@ -44,40 +79,84 @@ class HashTable:
         return hash
 
     def djb2(self, key):
-        pass
+        """
+        DJB2 hash, 32-bit
+
+        Implement this, and/or FNV-1.
+        """
+        # Your code here
 
 
     def hash_index(self, key):
+        """
+        Take an arbitrary key and return a valid integer index
+        between within the storage capacity of the hash table.
+        """
         return self.fnv1(key) % self.capacity
         # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
+        """
+        Store the value with the given key.
+
+        Hash collisions should be handled with Linked List Chaining.
+
+        Implement this.
+        """
+        # Beej mentioned keep increment counter for size. do i put
+        # size += 1 under each pos.key if statement
         index = self.hash_index(key)
         
-        new_node = HashTableEntry(key, value)
-
-        if self.head is None:
-            self.head = new_node
+        if self.hash[index] == None:
+            self.hash[index] = HashTableEntry(key, value)
         else:
-            self.head.next(new_node)
-            self.head = new_node
-            self.size += 1
+            pos = self.hash[index]
+            while pos != None:
+                if pos.key == key:
+                    pos.value = value
+                    return
+                if pos.next == None:
+                    pos.next = HashTableEntry(key, value)
+                    return
+                pos = pos.next
+        
+        # new_node = HashTableEntry(key, value)
+
+        # if self.head is None and self.tail is None:
+        #     self.head = new_node
+        #     self.tail = new_node
+        # else:
+        #     self.tail = self.next(new_node)
+        #     self.tail = new_node
 
 
     def delete(self, key):
+        """
+        Remove the value stored with the given key.
+
+        Print a warning if the key is not found.
+
+        Implement this.
+        """
         self.put(key, None)
         self.size -= 1
 
 
     def get(self, key):
+        """
+        Retrieve the value stored with the given key.
+
+        Returns None if the key is not found.
+
+        Implement this.
+        """
         index = self.hash_index(key)
 
-        cur = self.head
-
-        while cur is not None:
-            if cur.key == key:
-                return cur.key
-            cur = cur.next
+        pos = self.hash[index]
+        while pos != None:
+            if pos.key == key:
+                return pos.value
+            pos = pos.next
         return None
 
 
