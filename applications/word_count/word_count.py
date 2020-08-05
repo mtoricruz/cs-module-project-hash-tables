@@ -1,5 +1,24 @@
+characters_to_ignore = '" : , . - + = / \ | [ ] { } ( ) * ^ &'.split(' ')
 def word_count(s):
-    # Your code here
+    d = {}
+    for character in characters_to_ignore:
+        s = s.replace(character, '')
+        
+    sentence = s.split(' ')
+    for word in sentence:
+        word = word.lower()
+        if word.isspace():
+            continue
+
+        if word == '':
+            return {}
+
+        if word not in d:
+            d[word] = 0
+        
+        d[word] += 1
+
+    return d
 
 
 
